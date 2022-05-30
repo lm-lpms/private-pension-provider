@@ -11,14 +11,17 @@ public class AccountOpeningService {
     private BackgroundCheckService backgroundCheckService;
     private ReferenceIdsManager referenceIdsManager;
     private AccountRepository accountRepository;
+    private AccountOpeningEventPublisher accountOpeningEventPublisher;
 
 
     public AccountOpeningService(BackgroundCheckService backgroundCheckService,
                                  ReferenceIdsManager referenceIdsManager,
-                                 AccountRepository accountRepository) {
+                                 AccountRepository accountRepository,
+                                 AccountOpeningEventPublisher accountOpeningEventPublisher) {
         this.backgroundCheckService = backgroundCheckService;
         this.referenceIdsManager = referenceIdsManager;
         this.accountRepository = accountRepository;
+        this.accountOpeningEventPublisher = accountOpeningEventPublisher;
     }
 
 
