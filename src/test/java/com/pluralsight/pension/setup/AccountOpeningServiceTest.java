@@ -3,6 +3,7 @@ package com.pluralsight.pension.setup;
 import com.pluralsight.pension.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
@@ -14,8 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class AccountOpeningServiceTest {
 
@@ -59,14 +59,22 @@ class AccountOpeningServiceTest {
     }
 
     @Test
-    @Disabled
     public void shouldNotOpenAccount_ThrowsException() throws IOException {
         when(backgroundCheckServiceMock.confirm(eq(FIRST_NAME), anyString(), anyString(), any(LocalDate.class)))
                 .thenThrow(new IOException());
-        assertThrows(IOException.class, ()-> backgroundCheckServiceMock.confirm(eq(FIRST_NAME), anyString(), anyString(), any(LocalDate.class)));
+        assertThrows(IOException.class, ()-> testObj.openAccount("John", "Smith", "123XYZ9", LocalDate.of(1990, 1, 1)));
     }
 
-
+    @Test
+    @DisplayName("Stubbing void methods")
+    public void shouldNotOpenAccount_RunTimeException() throws IOException {
+        final BackgroundCheckResults backgroundCheckResults = new BackgroundCheckResults("something_acceptable", 50);
+        when(backgroundCheckServiceMock.confirm(anyString(), anyString(), anyString(), any(LocalDate.class)))
+                .thenReturn(backgroundCheckResults);
+        when(referenceIdsManagerMock.obtainId(anyString(), anyString(), anyString(), any(LocalDate.class))).thenReturn("someId");
+        doThrow(new RuntimeException()).when(accountOpeningEventPublisher).notify("someId");
+        assertThrows(RuntimeException.class, ()-> testObj.openAccount("John", "Smith", "123XYZ9", LocalDate.of(1990, 1, 1)));
+    }
 
 
 }
